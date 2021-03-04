@@ -11,6 +11,9 @@ use expression_parser::parse_boolean_expression;
 use renderer::Renderer;
 
 fn main() {
+
+    println!("Awaiting boolean function from stdin");
+
     let mut buffer = String::new();
     stdin().read_line(&mut buffer).unwrap();
 

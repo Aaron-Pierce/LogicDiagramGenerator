@@ -362,6 +362,7 @@ pub fn parse_boolean_expression(string: &str) -> Gate {
             || (p1 == 0 && *c2 == '(')
             || (*c1 == ')' && p2 == 0)
             || (*c1 == '\'' && p2 == 0)
+            || (*c1 == ')' && *c2 == '(')
         {
             explicitly_multiplied.push('*');
         }
