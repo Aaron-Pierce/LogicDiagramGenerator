@@ -191,7 +191,7 @@ impl Renderer {
             y: size,
         };
 
-        
+
         let v_metrics = self.font.v_metrics(scale);
         let offset = point(0.0, 0.0);
 

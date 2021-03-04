@@ -149,12 +149,6 @@ impl Gate {
     ) -> u32 {
         let signed_index = (index_relative_to_siblings * 2) as i32 - 1;
 
-        println!("Signed_index is {}", signed_index);
-
-        // if self.get_type() == GateType::INPUT {
-        //     return (last_origin as i32 + signed_index*(12)) as u32;
-        // }
-
         if num_parent_inputs == 1 {
             return last_origin;
         }
@@ -183,6 +177,7 @@ impl Gate {
         let this_y =
             self.child_yoffset_function(prev_root, index_relative_to_siblings, num_parent_inputs);
 
+            println!("{}: this_y_min: {}", self.get_name(), this_y);
         if self.inputs.len() == 0 {
             return this_y;
         } else {
@@ -208,6 +203,8 @@ impl Gate {
         let this_y =
             self.child_yoffset_function(prev_root, index_relative_to_siblings, num_parent_inputs);
 
+            println!("{}: this_y_max: {}", self.get_name(), this_y);
+
         if self.inputs.len() == 0 {
             return this_y;
         } else {
@@ -221,30 +218,35 @@ impl Gate {
                 child_inputs.push(found_value);
             }
 
-            return this_y.max(*child_inputs.iter().max().unwrap_or(&0)) + 40;
+            println!("child inputs for {} max {:#?}", self.name, child_inputs);
+            println!("...and max was {}", this_y.max(*child_inputs.iter().max().unwrap_or(&0)));
+
+            return this_y.max(*child_inputs.iter().max().unwrap_or(&0));
         }
     }
 
     pub fn calculate_drawn_image_height(&self) -> u32 {
         println!("Calculating drawn image height....");
-        let max = self.find_max_y_element((2 as u32).pow(self.depth()) * 50, 0, 0);
-        let min = self.find_min_y_element((2 as u32).pow(self.depth()) * 50, 0, 0);
+        let mut max = self.find_max_y_element((2 as u32).pow(self.depth()) * 50, 0, 1);
+        max = max + 40;
+        let min = self.find_min_y_element((2 as u32).pow(self.depth()) * 50, 0, 1);
         println!("Found max: {}", max);
         println!("Found min: {}", min);
-        2 * (max - min) + 20
+        9*(max - min)/8 + 50
     }
 
     pub fn adjusted_origin(&self, init_origin: u32) -> u32 {
-        let max = self.find_max_y_element((2 as u32).pow(self.depth()) * 50, 0, 0);
-        let min = self.find_min_y_element((2 as u32).pow(self.depth()) * 50, 0, 0);
-        // return (init_origin as i32 + (((2 as u32).pow(self.depth()) * 50) as i32) - ((max + min)/2) as i32) as u32;
+        // let imaginary_origin = (2 as u32).pow(self.depth()) * 50;
+        let imaginary_origin = 2048;
+        let max = self.find_max_y_element(imaginary_origin, 0, 1);
+        let min = self.find_min_y_element(imaginary_origin, 0, 1);
 
-        let diff = ((max + min) / 2) as i32 - ((2 as u32).pow(self.depth()) * 50) as i32;
+        let diff = ((max + min) / 2) as i32 - (imaginary_origin) as i32;
         println!("We think the origin is off by {}", diff);
-        println!("Informed by max: {}, min: {}, average: {}, origin: {}", max, min, (max + min) / 2, (2 as u32).pow(self.depth()) * 50);
-        // return (init_origin as i32 - diff) as u32;
-        // (init_origin as i32 + diff) as u32
-        (init_origin as i32) as u32
+        println!("Informed by max: {}, min: {}, average: {}, origin: {}", max, min, (max + min) / 2, imaginary_origin);
+        // return (init_origin as i32 + diff) as u32;
+        (init_origin as i32 - diff) as u32 - 19
+        // (init_origin as i32) as u32
     }
 
     pub fn column_sizes(&self) -> Vec<u32> {
